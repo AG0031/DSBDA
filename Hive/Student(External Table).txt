@@ -1,0 +1,46 @@
+-- A. Drop the database if it exists
+DROP DATABASE IF EXISTS student_db CASCADE;
+
+-- Create the database
+CREATE DATABASE IF NOT EXISTS student_db;
+
+-- Use the new database
+USE student_db;
+
+-- Drop the table if it exists
+DROP TABLE IF EXISTS student;
+
+-- Create the main managed student table
+CREATE TABLE student (
+    student_id INT,
+    name STRING,
+    branch STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+-- Alter the table to add a new column (e.g., year)
+ALTER TABLE student ADD COLUMNS (year INT);
+
+-- B. Load data into the managed table (from local file system)
+LOAD DATA LOCAL INPATH '/home/cloudera/Desktop/students.csv'
+INTO TABLE student;
+
+-- C. Create an external table with same structure (excluding the new column)
+CREATE EXTERNAL TABLE IF NOT EXISTS external_student (
+    student_id INT,
+    name STRING,
+    branch STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+
+INSERT INTO TABLE external_student SELECT * FROM student;
+
+
+student.csv
+1,John Doe,Computer Science
+2,Jane Smith,Mechanical
+3,Bob Brown,Civil

@@ -1,0 +1,78 @@
+-- A. Create Database
+CREATE DATABASE IF NOT EXISTS student_db;
+USE student_db;
+
+-- Drop tables if they exist
+DROP TABLE IF EXISTS student_info;
+DROP TABLE IF EXISTS student_marks;
+
+-- Create Table 1: Student Info
+CREATE TABLE student_info (
+    stu_id INT,
+    stu_name STRING,
+    stu_branch STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+-- Create Table 2: Student Marks
+CREATE TABLE student_marks (
+    stu_id INT,
+    subject STRING,
+    marks INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+-- Alter student_info: Add new column (optional)
+ALTER TABLE student_info ADD COLUMNS (email STRING);
+
+-- B. Load data from local files
+LOAD DATA LOCAL INPATH '/home/cloudera/Desktop/students.csv' INTO TABLE student_info;
+LOAD DATA LOCAL INPATH '/home/cloudera/Desktop/marks.csv' INTO TABLE student_marks;
+
+-- C. Join Tables
+SELECT 
+    si.stu_id,
+    si.stu_name,
+    si.stu_branch,
+    sm.subject,
+    sm.marks
+FROM 
+    student_info si
+JOIN 
+    student_marks sm
+ON 
+    si.stu_id = sm.stu_id;
+
+-- D. Students with marks > 80
+SELECT 
+    si.stu_id,
+    si.stu_name,
+    sm.subject,
+    sm.marks
+FROM 
+    student_info si
+JOIN 
+    student_marks sm
+ON 
+    si.stu_id = sm.stu_id
+WHERE 
+    sm.marks > 80;
+
+
+student.csv
+1,John Doe,Computer Science
+2,Jane Smith,Mechanical
+3,Bob Brown,Civil
+4,Alice White,Electrical
+
+marks.csv
+1,Math,75
+1,English,85
+2,Math,90
+3,Physics,70
+4,Math,88
+4,Chemistry,82

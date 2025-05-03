@@ -1,0 +1,60 @@
+-- Drop tables if they exist
+DROP TABLE IF EXISTS patient;
+DROP TABLE IF EXISTS doctor;
+
+-- Create Patient table
+CREATE TABLE patient (
+    patient_id INT,
+    name STRING,
+    age INT,
+    disease STRING,
+    doctor_id INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+-- Create Doctor table
+CREATE TABLE doctor (
+    doctor_id INT,
+    doctor_name STRING,
+    specialization STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+-- Load data from LOCAL file system
+LOAD DATA LOCAL INPATH '/home/cloudera/Desktop/patients.csv' INTO TABLE patient;
+LOAD DATA LOCAL INPATH '/home/cloudera/Desktop/doctors.csv' INTO TABLE doctor;
+
+-- Insert additional patient record
+INSERT INTO TABLE patient VALUES (4, 'Alice White', 38, 'Hypertension', 101);
+
+-- Insert additional doctor record
+INSERT INTO TABLE doctor VALUES (104, 'Dr. Miller', 'Neurology');
+
+-- Join: Show patient with doctor details
+SELECT 
+    p.patient_id,
+    p.name AS patient_name,
+    p.disease,
+    d.doctor_name,
+    d.specialization
+FROM 
+    patient p
+JOIN 
+    doctor d
+ON 
+    p.doctor_id = d.doctor_id;
+
+
+patients.csv
+1,John Doe,45,Diabetes,101
+2,Jane Smith,29,Asthma,102
+3,Bob Johnson,60,Cancer,103
+
+doctors.csv
+101,Dr. Adams,Endocrinology
+102,Dr. Brown,Pulmonology
+103,Dr. Clark,Oncology
