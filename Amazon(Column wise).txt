@@ -1,0 +1,59 @@
+import pandas as pd
+
+# Load the dataset
+df = pd.read_csv('Amazonbookreviews.csv')
+
+Data Cleaning
+
+# Drop duplicates
+df = df.drop_duplicates()
+
+# Drop rows with too many missing values
+df = df.dropna(thresh=len(df.columns) - 2)
+
+# Fill remaining missing values
+df = df.fillna("Unknown")
+
+print("After cleaning:\n", df.info())
+df.head()
+
+Column-wise Subset
+
+# Selecting only specific columns
+column_subset = df[['overallRating', 'reviewername', 'Summary']]
+column_subset.head()
+
+Merge Data Column-wise
+
+# Split DataFrame into two and merge side by side
+df_part1 = df.iloc[:, :3]   # First 3 columns
+df_part2 = df.iloc[:, 3:6]  # Next 3 columns
+
+# Merge column-wise using concat with axis=1
+merged_columnwise = pd.concat([df_part1.reset_index(drop=True), df_part2.reset_index(drop=True)], axis=1)
+merged_columnwise.head()
+
+Sort Data
+
+# Sort by Rating descending
+sorted_df = df.sort_values(by='overallRating', ascending=False)
+sorted_df.head()
+
+Transpose Data
+
+# Transpose the DataFrame
+transposed_df = df.T
+transposed_df.head()
+
+Reshape Data
+
+# Melt: wide to long format
+melted_df = pd.melt(df, id_vars=['overallRating'], value_vars=['reviewername','Summary'])
+melted_df.head()
+
+# Fix for duplicates: Add a unique row ID
+melted_df['row_id'] = melted_df.index
+
+# Pivot: long back to wide using row_id
+reshaped_df = melted_df.pivot(index='row_id', columns='variable', values='value')
+reshaped_df.head()

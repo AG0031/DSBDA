@@ -1,0 +1,66 @@
+import pandas as pd
+
+#load Dataset
+df = pd.read_csv("Amazonbookreviews.csv")
+
+Data Cleaning
+
+#Display Basic info
+print(df.info())
+
+#Drop duplicates
+df = df.drop_duplicates()
+
+#Handle missing values : remove rows with too many NaNs
+df = df.dropna(thresh=len(df.columns) - 2) # allow up to 2 NaNs
+
+#Fill remaining NaNs (example : fill with placeholder)
+df = df.fillna('Unknown')
+
+#Check cleaned data
+df.head()
+
+Data Subsets (Row Wise)
+
+#Subset rows where rating >= 4
+subset_high_rating = df[df['overallRating'] >= 4]
+
+#Display the subset
+subset_high_rating.head()
+
+Merge Data (Row Wise)
+
+#Create a second subset (e.g low rating)
+subset_low_rating = df[df['overallRating'] <= 2]
+
+#Row-wise merge (stacking)
+merged_df = pd.concat([subset_high_rating, subset_low_rating])
+
+#Display merged data
+merged_df
+
+Sort Data
+
+#Sort by rating decending
+sorted_df = df.sort_values(by='overallRating', ascending=False)
+
+sorted_df.head()
+
+Transposing Data
+
+df_transposed = df.T
+
+df_transposed.head()
+
+Reshaping Data
+
+#Melt Example: Gather columns into key-value pairs
+melted_df = pd.melt(df, id_vars=['overallRating'], value_vars=['reviewername', 'reviewerText'])
+
+melted_df.head()
+
+#Pivot eample: reversing the melt
+pivot_df = melted_df.pivot_table(index='overallRating', columns='variable', values='value', aggfunc='first')
+
+pivot_df.head()
+

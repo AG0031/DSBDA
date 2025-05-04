@@ -1,0 +1,72 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error
+
+Data Cleaning
+
+# Load dataset
+df = pd.read_csv('AirQualityUCI.csv', sep=',', encoding='utf-8-sig')
+
+# Drop unnamed or empty columns
+df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+
+# a. Data Cleaning
+# Replace missing values denoted by -200 with NaN
+df.replace(-200, np.nan, inplace=True)
+
+# Drop rows where target variable is missing
+df.dropna(subset=['CO(GT)'], inplace=True)
+
+# Fill other missing values with column mean
+df.fillna(df.mean(numeric_only=True), inplace=True)
+
+df.head()
+
+Data Integration
+
+# Create 'Datetime' column
+if 'Date' in df.columns and 'Time' in df.columns:
+    df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], dayfirst=True, errors='coerce')
+    df.drop(['Date', 'Time'], axis=1, inplace=True)
+else:
+    raise KeyError("The columns 'Date' and/or 'Time' are missing from the dataset.")
+
+# Reorder columns
+df = df[['Datetime'] + [col for col in df.columns if col != 'Datetime']]
+
+# Simulate extra data
+extra_data = df[['Datetime']].copy()
+extra_data['WeatherIndex'] = np.random.uniform(0.5, 1.5, size=len(extra_data))
+
+# Merge on 'Datetime'
+df_merged = pd.merge(df, extra_data, on='Datetime', how='left')
+
+# Check merged output
+df_merged.head()
+
+Data Transformation
+
+features = df_merged.drop(columns=['Datetime','CO(GT)'])
+target = df_merged['CO(GT)']
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(features)
+
+#Train/Test split
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, target, test_size=0.2, random_state=42)
+
+Data Modeling
+
+#Build Linear Regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+#Predict
+y_pred = model.predict(X_test)
+
+#Evaluate
+mse = mean_squared_error(y_test,y_pred)
+print(f"Mean Squared Error: {mse:.2f}")

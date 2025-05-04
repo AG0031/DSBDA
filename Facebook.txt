@@ -1,0 +1,40 @@
+import pandas  as pd
+df=pd.read_csv("dataset_Facebook.csv",delimiter=";")
+
+df
+
+df_transposed = df.T
+df_transposed.head()
+
+# Sort by 'like' column in descending order
+df_sorted = df.sort_values(by='like', ascending=False)
+
+# Display sorted data
+df_sorted.head()
+
+# Sort by 'like' column in descending order
+df_sorted = df.sort_values(by='comment', ascending=False)
+
+# Display sorted data
+df_sorted.head()
+
+# Select specific columns
+subset_columns = df[['Page total likes', 'Type', 'like']]
+
+# Filter rows where 'like' > 500
+subset_filtered = subset_columns[subset_columns['like'] > 500]
+
+#Display subset
+subset_filtered.head()
+
+#Create a dummy dataframe to merge
+df2 = pd.DataFrame({
+    'Type': ['Photo','Status'],
+    'Category': ['Visual','Text']
+})
+
+#Merge on 'Type' column
+merged_df = pd.merge(df, df2, on='Type', how='left')
+
+#Display merged data
+merged_df.head()
