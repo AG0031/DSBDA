@@ -1,0 +1,89 @@
+# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from mpl_toolkits.mplot3d import Axes3D
+
+# Read dataset
+df = pd.read_csv('Iris.csv')
+
+# --------------------
+# DATA CLEANING
+# --------------------
+
+# Drop 'Id' column
+df.drop(columns=['Id'], inplace=True)
+
+# Check for missing values
+print("Missing values:\n", df.isnull().sum())
+
+# Check for duplicates
+duplicates = df.duplicated().sum()
+print(f"\nNumber of duplicate rows: {duplicates}")
+
+# Drop duplicates if any
+df.drop_duplicates(inplace=True)
+
+# Summary stats
+print("\nSummary statistics:")
+print(df.describe())
+
+# --------------------
+# 1D PLOT - Histogram
+# --------------------
+plt.figure(figsize=(10, 6))
+for i, col in enumerate(df.columns[:-1]):
+    plt.subplot(2, 2, i+1)
+    sns.histplot(df[col], kde=True, bins=15)
+    plt.title(f'Distribution of {col}')
+plt.tight_layout()
+plt.suptitle("1D Histograms", y=1.02)
+plt.show()
+
+# --------------------
+# 2D PLOT - Scatter
+# --------------------
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='SepalLengthCm', y='PetalLengthCm', hue='Species', data=df)
+plt.title("2D Scatter: Sepal Length vs Petal Length")
+plt.xlabel("Sepal Length (cm)")
+plt.ylabel("Petal Length (cm)")
+plt.show()
+
+# --------------------
+# 3D PLOT - 3D Scatter
+# --------------------
+fig = plt.figure(figsize=(10, 7))
+ax = fig.add_subplot(111, projection='3d')
+species = df['Species'].unique()
+colors = ['r', 'g', 'b']
+
+for i, s in enumerate(species):
+    temp_df = df[df['Species'] == s]
+    ax.scatter(temp_df['SepalLengthCm'], temp_df['PetalLengthCm'], temp_df['PetalWidthCm'],
+               label=s, color=colors[i])
+    
+ax.set_xlabel("Sepal Length")
+ax.set_ylabel("Petal Length")
+ax.set_zlabel("Petal Width")
+plt.title("3D Scatter Plot")
+plt.legend()
+plt.show()
+
+# --------------------
+# TEMPORAL PLOT (simulated time)
+# --------------------
+
+# Simulate a time column
+df['Date'] = pd.date_range(start='2024-01-01', periods=len(df), freq='D')
+
+# Temporal trend for Sepal Length
+plt.figure(figsize=(10, 5))
+sns.lineplot(x='Date', y='SepalLengthCm', hue='Species', data=df)
+plt.title("Temporal Trend of Sepal Length (simulated)")
+plt.xlabel("Date")
+plt.ylabel("Sepal Length (cm)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()

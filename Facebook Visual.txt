@@ -1,0 +1,102 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset with correct delimiter
+df = pd.read_csv('dataset_Facebook.csv', delimiter=';')
+
+# ---------------------------------------
+# Step 1: Clean Column Names
+# ---------------------------------------
+# Remove spaces and special characters for easier handling
+df.columns = df.columns.str.replace(' ', '_')
+df.columns = df.columns.str.replace('[^A-Za-z0-9_]', '', regex=True)
+
+print("Before Cleaning:")
+print(df.info())
+print(df.head())
+
+# ---------------------------------------
+# Step 2: Handle Missing Values
+# ---------------------------------------
+
+# Show how many missing values in each column
+print("\nMissing values before cleaning:")
+print(df.isnull().sum())
+
+# Define columns to fix: numeric engagement columns
+num_cols = ['like', 'share', 'comment']
+
+# Fill missing values with column mean for numeric columns
+for col in num_cols:
+    if df[col].isnull().sum() > 0:
+        mean_value = df[col].mean()
+        df[col].fillna(mean_value, inplace=True)
+
+# Drop rows where many values are missing (keep rows with at least 5 valid entries)
+df.dropna(thresh=5, inplace=True)
+
+# ---------------------------------------
+# Step 3: Remove Duplicates
+# ---------------------------------------
+df.drop_duplicates(inplace=True)
+
+# ---------------------------------------
+# Step 4: Convert Columns to Correct Data Types
+# ---------------------------------------
+# Convert 'Type' to category
+df['Type'] = df['Type'].astype('category')
+
+# Ensure month and hour columns are integers
+df['Post_Month'] = df['Post_Month'].astype(int)
+df['Post_Hour'] = df['Post_Hour'].astype(int)
+
+# Show updated data info
+print("\nAfter Cleaning:")
+print(df.info())
+
+
+# --- Visualizations ---
+
+sns.set_style("whitegrid")
+
+# Box plot: Distribution of Total Interactions by Post Type
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='Type', y='Total_Interactions', data=df)
+plt.title('Distribution of Total Interactions by Post Type')
+plt.xlabel('Post Type')
+plt.ylabel('Total Interactions')
+plt.show()
+
+# Histogram: Distribution of Posts by Hour of Day
+plt.figure(figsize=(10, 6))
+sns.histplot(df['Post_Hour'], bins=24, kde=True)
+plt.title('Distribution of Posts by Hour of Day')
+plt.xlabel('Hour of Day')
+plt.ylabel('Number of Posts')
+plt.xticks(range(0, 24))
+plt.show()
+
+# Single Line Graph: Average Lifetime Post Reach by Hour of Posting
+hourly_reach = df.groupby('Post_Hour')['Lifetime_Post_Total_Reach'].mean()
+plt.figure(figsize=(12, 6))
+hourly_reach.plot(kind='line', marker='o')
+plt.title('Average Lifetime Post Reach by Hour of Posting')
+plt.xlabel('Hour of Day')
+plt.ylabel('Average Reach')
+plt.xticks(range(0, 24))
+plt.grid(True)
+plt.show()
+
+# Multiple Line Graph: Average Engagement Metrics (Likes, Shares, Comments) by Month
+monthly_metrics = df.groupby('Post_Month')[['like', 'share', 'comment']].mean()
+plt.figure(figsize=(12, 6))
+for column in monthly_metrics.columns:
+    plt.plot(monthly_metrics.index, monthly_metrics[column], marker='o', label=column)
+plt.title('Average Engagement Metrics by Month')
+plt.xlabel('Month')
+plt.ylabel('Average Count')
+plt.legend()
+plt.grid(True)
+plt.xticks(range(1, 13))
+plt.show()

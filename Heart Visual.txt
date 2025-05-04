@@ -1,0 +1,63 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ---------------------------------------------
+# Step 1: Load the Heart Disease dataset
+# ---------------------------------------------
+df = pd.read_csv('heart.csv')  # Make sure 'heart.csv' is in your working directory
+
+# Check if there are any missing values
+print("Missing values before cleaning:\n", df.isnull().sum())
+
+# Fill missing values with the average of each column (if any)
+df.fillna(df.mean(), inplace=True)
+
+# Check again after cleaning
+print("\nMissing values after cleaning:\n", df.isnull().sum())
+
+# Set visual style
+sns.set(style="whitegrid")
+
+# ---------------------------------------------
+# Step 2: Create a 2x2 Grid of Visualizations
+# ---------------------------------------------
+fig, axs = plt.subplots(2, 2, figsize=(16, 12))  # Create 4 subplots in a 2x2 grid
+
+# ------------------ Plot 1: Boxplot ------------------
+# Compare cholesterol levels between people with and without heart disease
+sns.boxplot(x='target', y='chol', data=df, ax=axs[0, 0])
+axs[0, 0].set_title('Cholesterol Levels vs Heart Disease')
+axs[0, 0].set_xlabel('Heart Disease (1 = Yes, 0 = No)')
+axs[0, 0].set_ylabel('Cholesterol')
+
+# ------------------ Plot 2: Histogram ------------------
+# Show how ages are distributed in the dataset
+sns.histplot(df['age'], bins=20, kde=True, ax=axs[0, 1], color='skyblue')
+axs[0, 1].set_title('Age Distribution')
+axs[0, 1].set_xlabel('Age')
+axs[0, 1].set_ylabel('Number of People')
+
+# ------------------ Plot 3: Line Plot ------------------
+# Show average max heart rate for each age
+avg_thalach_by_age = df.groupby('age')['thalach'].mean()
+axs[1, 0].plot(avg_thalach_by_age.index, avg_thalach_by_age.values, color='green')
+axs[1, 0].set_title('Average Max Heart Rate by Age')
+axs[1, 0].set_xlabel('Age')
+axs[1, 0].set_ylabel('Avg Max Heart Rate')
+
+# ------------------ Plot 4: Multi-Line Plot ------------------
+# Compare average cholesterol levels by age for males and females
+avg_chol_by_age_sex = df.groupby(['age', 'sex'])['chol'].mean().unstack()
+axs[1, 1].plot(avg_chol_by_age_sex.index, avg_chol_by_age_sex[0], label='Female', color='red')
+axs[1, 1].plot(avg_chol_by_age_sex.index, avg_chol_by_age_sex[1], label='Male', color='blue')
+axs[1, 1].set_title('Cholesterol by Age and Gender')
+axs[1, 1].set_xlabel('Age')
+axs[1, 1].set_ylabel('Avg Cholesterol')
+axs[1, 1].legend(title='Sex')
+
+# ---------------------------------------------
+# Step 3: Show all plots nicely
+# ---------------------------------------------
+plt.tight_layout()
+plt.show()
