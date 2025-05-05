@@ -41,7 +41,7 @@ STORED AS TEXTFILE;
 INSERT INTO TABLE external_student SELECT * FROM student;
 
 
-student.csv
+students.csv
 1,John Doe,Computer Science
 2,Jane Smith,Mechanical
 3,Bob Brown,Civil
