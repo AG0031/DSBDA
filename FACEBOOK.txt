@@ -1,0 +1,44 @@
+
+import numpy as np 
+import pandas as pd
+
+df = pd.read_csv('dataset_Facebook.csv', sep=';')
+
+df.head()
+
+df.columns
+
+df.info()
+
+df.shape
+
+df.columns
+
+print(df.isnull().sum())
+
+df.drop_duplicates(inplace=True)
+
+df.transpose()
+
+
+sort_values = df.sort_values('Page total likes', ascending=False)
+
+df1 = df[['Page total likes','Category', 'Post Month']].loc[0:15]
+df1
+
+
+df2 = df[['Page total likes','Category', 'Post Month']].loc[16:30]
+df2
+
+
+df3 = df[['Page total likes','Category', 'Post Month']].loc[31:45]
+df3
+
+
+merging = pd.concat([df1,df2,df3])
+merging
+
+merge_sort = df.sort_values('Page total likes', ascending=False)
+merge_sort
+
+
