@@ -31,11 +31,12 @@ INTO TABLE student;
 CREATE EXTERNAL TABLE IF NOT EXISTS external_student (
     student_id INT,
     name STRING,
-    branch STRING
+    branch STRING,
+    year INT
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
-STORED AS TEXTFILE
+STORED AS TEXTFILE;
 
 INSERT INTO TABLE external_student SELECT * FROM student;
 
