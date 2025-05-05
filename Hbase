@@ -1,0 +1,42 @@
+//terminal 1
+
+sudo service zookeeper-server start
+sudo service hadoop-hdfs-namenode start
+sudo service hadoop-hdfs-datanode start
+sudo service hbase-master start
+sudo service hbase-regionserver start
+
+hbase shell
+
+create 'student_hbase', 'info', 'marks'
+put 'student_hbase', '1', 'info:name', 'John'
+put 'student_hbase', '1', 'info:branch', 'CSE'
+put 'student_hbase', '1', 'marks:math', '85'
+put 'student_hbase', '1', 'marks:physics', '90'
+
+put 'student_hbase', '2', 'info:name', 'Alice'
+put 'student_hbase', '2', 'info:branch', 'ECE'
+put 'student_hbase', '2', 'marks:math', '78'
+put 'student_hbase', '2', 'marks:physics', '88'
+
+//terminal 2
+
+hive
+
+DROP TABLE IF EXISTS student_hive;
+
+CREATE EXTERNAL TABLE student_hive (
+    key STRING,
+    name STRING,
+    branch STRING,
+    math INT,
+    physics INT
+)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+WITH SERDEPROPERTIES (
+    "hbase.columns.mapping" = ":key,info:name,info:branch,marks:math,marks:physics"
+)
+TBLPROPERTIES ("hbase.table.name" = "student_hbase");
+
+
+SELECT * FROM student_hive;
