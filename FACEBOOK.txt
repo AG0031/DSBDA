@@ -38,6 +38,12 @@ df3
 merging = pd.concat([df1,df2,df3])
 merging
 
+import numpy as np
+
+arr = np.array(df[['Post Month', 'Post Weekday']].head(6))
+reshaped = arr.reshape(3, 4)
+print(reshaped)
+
 merge_sort = df.sort_values('Page total likes', ascending=False)
 merge_sort
 
